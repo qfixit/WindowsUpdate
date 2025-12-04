@@ -1,0 +1,17 @@
+<toast scenario="reminder" launch="win11upgrade-reboot">
+  <visual>
+    <binding template="ToastGeneric">
+      <image placement="hero" src="C:\Temp\WindowsUpdate\Toast-Notification\hero.jpg"/>
+      <text placement="attribution">Koltiv</text>
+      <text>Windows 11 Upgrade</text>
+      <text hint-style="title" hint-wrap="true">Please reboot to finish the Windows 11 upgrade</text>
+      <text hint-style="body" hint-wrap="true">Windows 11 is installed and waiting to finish. Reboot as soon as convenient. The first restart can take longer than normal; do not power off during the upgrade.</text>
+    </binding>
+  </visual>
+  <audio src="ms-winsoundevent:Notification.Looping.Alarm" silent="true"/>
+  <actions>
+    <action activationType="protocol" arguments="Dismiss" content="OK"/>
+    <action activationType="protocol" arguments="mailto:support@koltiv.com?subject=Windows%2011%20Update%20Notification" content="Contact Koltiv Support"/>
+    <action activationType="protocol" arguments="https://contoso.com/windows11-upgrade-guide" content="View Upgrade Guide"/>
+  </actions>
+</toast>

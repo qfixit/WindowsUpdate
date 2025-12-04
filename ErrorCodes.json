@@ -1,0 +1,130 @@
+[
+  {
+    "Code": "0x8007007F",
+    "Title": "Insufficient privileges or system components missing",
+    "Description": "Setup failed with STATUS_INVALID_IMAGE_WIN32 or missing system components.",
+    "Remediation": "Run the upgrade as an administrator, disable conflicting AV, and run DISM /RestoreHealth then SFC /SCANNOW. Verify system drive integrity and retry.",
+    "Recoverable": true,
+    "Command": "dism.exe /Online /Cleanup-Image /RestoreHealth && sfc /scannow"
+  },
+  {
+    "Code": "0x80070070",
+    "Title": "Insufficient disk space",
+    "Description": "Windows setup reported not enough free space to continue.",
+    "Remediation": "Free disk space to at least 64 GB, empty recycle bin, remove temp files, and retry the upgrade.",
+    "Recoverable": true,
+    "Command": "cleanmgr.exe /verylowdisk"
+  },
+  {
+    "Code": "0x80070005",
+    "Title": "Access denied",
+    "Description": "Permissions or policy prevented setup from continuing.",
+    "Remediation": "Run as administrator, ensure UAC/policies/AV are not blocking setup, and verify access to C:\\Temp\\WindowsUpdate.",
+    "Recoverable": true,
+    "Command": "icacls C:\\Temp\\WindowsUpdate /grant *S-1-5-18:(OI)(CI)F"
+  },
+  {
+    "Code": "0xC1900101",
+    "Title": "Driver-related rollback",
+    "Description": "Setup detected a driver crash or incompatible driver during upgrade.",
+    "Remediation": "Update or remove problematic drivers (storage, network, display, AV). Check Panther/setupact.log for the failing driver and retry after remediation.",
+    "Recoverable": false,
+    "Command": ""
+  },
+  {
+    "Code": "0xC1900200",
+    "Title": "Device does not meet prerequisites",
+    "Description": "Hardware requirements were not met for Windows 11 (TPM, Secure Boot, CPU, RAM, disk, or WinRE disabled).",
+    "Remediation": "Verify CPU, TPM 2.0, Secure Boot, RAM, disk space, and ensure Windows RE is enabled; remediate firmware or enable WinRE and retry.",
+    "Recoverable": true,
+    "Command": "reagentc.exe /enable"
+  },
+  {
+    "Code": "0xC1900201",
+    "Title": "Unsupported processor",
+    "Description": "The CPU does not meet Windows 11 requirements.",
+    "Remediation": "Use supported hardware or approved policies that allow installation on unsupported CPUs, then retry.",
+    "Recoverable": false,
+    "Command": ""
+  },
+  {
+    "Code": "0xC1900208",
+    "Title": "Application or driver compatibility block",
+    "Description": "Setup blocked due to incompatible application or driver.",
+    "Remediation": "Review CompatData XML/logs to identify the blocking app/driver, remove or update it, then rerun the upgrade.",
+    "Recoverable": false,
+    "Command": ""
+  },
+  {
+    "Code": "0xC1900107",
+    "Title": "Cleanup pending from previous upgrade",
+    "Description": "A previous upgrade requires cleanup of $WINDOWS.~BT before continuing.",
+    "Remediation": "Delete $WINDOWS.~BT (and related temp setup folders) then rerun the upgrade; the script will attempt this automatically.",
+    "Recoverable": true,
+    "Command": "cmd.exe /c rmdir /s /q %SystemDrive%\\$WINDOWS.~BT"
+  },
+  {
+    "Code": "0x80004005",
+    "Title": "Unspecified failure",
+    "Description": "Setup returned an unspecified error.",
+    "Remediation": "Review setup logs in C:\\Temp\\WindowsUpdate\\SetupLogs and Panther for details; rerun after addressing the underlying issue.",
+    "Recoverable": false,
+    "Command": ""
+  },
+  {
+    "Code": "0xC1900204",
+    "Title": "Unsupported installation choice",
+    "Description": "Setup configuration is incompatible with the target system.",
+    "Remediation": "Verify edition/architecture match, remove conflicting language packs, and ensure setup arguments are correct; retry.",
+    "Recoverable": false,
+    "Command": ""
+  },
+  {
+    "Code": "0x80072EE2",
+    "Title": "Timeout downloading updates",
+    "Description": "Network timeout occurred while downloading updates.",
+    "Remediation": "Check internet connectivity, proxy, and firewall; retry the upgrade.",
+    "Recoverable": true,
+    "Command": "netsh winhttp reset proxy"
+  },
+  {
+    "Code": "10",
+    "Title": "System shutdown in progress",
+    "Description": "Windows reported a shutdown during the upgrade.",
+    "Remediation": "Allow the device to reboot, then rerun the upgrade; self-repair will restage.",
+    "Recoverable": true,
+    "Command": ""
+  },
+  {
+    "Code": "11",
+    "Title": "ISO download transport unavailable",
+    "Description": "BITS/web request could not fetch the Windows 11 ISO.",
+    "Remediation": "Verify internet access, proxy/auth requirements, and BITS service health; rerun to resume download.",
+    "Recoverable": true,
+    "Command": "net start bits"
+  },
+  {
+    "Code": "12",
+    "Title": "ISO validation failed",
+    "Description": "ISO health/hash checks failed after retries.",
+    "Remediation": "Confirm the ISO URL and expected SHA256; rerun after updating configuration.",
+    "Recoverable": true,
+    "Command": ""
+  },
+  {
+    "Code": "13",
+    "Title": "ISO mount/staging failed",
+    "Description": "setup.exe could not mount or stage from the ISO after retries.",
+    "Remediation": "Check disk space, retry download, and review setup logs under C:\\Temp\\WindowsUpdate\\SetupLogs.",
+    "Recoverable": true,
+    "Command": "Mount-DiskImage -ImagePath C:\\Temp\\WindowsUpdate\\Windows11_25H2.iso -ErrorAction SilentlyContinue"
+  },
+  {
+    "Code": "14",
+    "Title": "Application/driver compatibility block (0xC1900208)",
+    "Description": "setup.exe reported an app or driver compatibility block.",
+    "Remediation": "Review setup logs for the blocking app/driver, remediate, then rerun the upgrade.",
+    "Recoverable": false,
+    "Command": ""
+  }
+]

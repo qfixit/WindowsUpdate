@@ -1,0 +1,38 @@
+{
+    "BaseLogFile": "C:\\Windows11UpgradeLog.txt",
+    "LogFile": null,
+    "StateDirectory": "C:\\Temp\\WindowsUpdate",
+    "UpgradeStateFiles": {
+        "ScriptRunning": "C:\\Temp\\WindowsUpdate\\ScriptRunning.txt",
+        "PendingReboot": "C:\\Temp\\WindowsUpdate\\PendingReboot.txt"
+    },
+    "FailureMarker": "C:\\Temp\\WindowsUpdate\\UpgradeFailed.txt",
+    "Windows11IsoUrl": "example.com*",
+    "ExpectedIsoSha256": "D141F6030FED50F75E2B03E1EB2E53646C4B21E5386047CB860AF5223F102A32",
+    "IsoFilePath": "C:\\Temp\\WindowsUpdate\\Windows11_25H2.iso",
+    "IsoHashCacheFile": "C:\\Temp\\WindowsUpdate\\Windows11_25H2.iso.sha256",
+    "MinimumIsoSizeBytes": 4294967296,
+    "SetupExeBaseArguments": "/Auto Upgrade /copylogs \"{0}\" /NoReboot /EULA accept /Quiet",
+    "SetupExeArguments": "",
+    "MoSetupVolatileKey": "HKLM:\\SYSTEM\\Setup\\MoSetup\\Volatile",
+    "PostRebootValidationTaskName": "Win11_PostRebootValidation",
+    "PostRebootValidationRunOnce": "Win11_PostRebootValidation_RunOnce",
+    "ReminderTaskNames": [
+        "Win11_RebootReminder_1",
+        "Win11_RebootReminder_2"
+    ],
+    "RebootReminder1Time": "11:00",
+    "RebootReminder2Time": "16:00",
+    "RebootReminderScript": "C:\\Temp\\WindowsUpdate\\RebootReminderNotification.ps1",
+    "RebootReminderVbs": "C:\\Temp\\WindowsUpdate\\RunHiddenReminder.vbs",
+    "PostRebootScriptPath": "C:\\Temp\\WindowsUpdate\\Windows11Upgrade.ps1",
+    "ToastAssetsRoot": "C:\\Temp\\WindowsUpdate\\Toast-Notification",
+    "ToastHeroImage": "hero.jpg",
+    "ToastLogoImage": "logo.jpg",
+    "DocLink": "@UpgradeGuide@",
+    "ToastAttributionText": "Koltiv",
+    "ToastHeaderText": "Windows 11 Upgrade",
+    "MinimumSentinelAgentVersion": "24.2.2.0",
+    "DynamicUpdate": true,
+    "AutoReboot": false
+}

@@ -1,0 +1,17 @@
+<toast launch="win11upgrade-progress">
+  <visual>
+    <binding template="ToastGeneric">
+      <image placement="hero" src="C:\Temp\WindowsUpdate\Toast-Notification\hero.jpg"/>
+      <text placement="attribution">Koltiv</text>
+      <text>Upgrade in Progress</text>
+      <text hint-style="body" hint-wrap="true">Windows 11 installation is running.</text>
+      <text hint-style="body" hint-wrap="true">Keep your device powered on and connected until the upgrade completes.</text>
+      <progress title="Progress" value="0.60" valueStringOverride="60%" status="Installing..."/>
+    </binding>
+  </visual>
+  <actions>
+    <action activationType="protocol" arguments="Dismiss" content="OK"/>
+    <action activationType="protocol" arguments="mailto:support@koltiv.com?subject=Windows%2011%20Update%20Notification" content="Contact Koltiv Support"/>
+    <action activationType="protocol" arguments="https://contoso.com/windows11-upgrade-guide" content="View Upgrade Guide"/>
+  </actions>
+</toast>
