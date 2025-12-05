@@ -48,7 +48,7 @@ function Invoke-TimedIsoDownload {
     $bitsAttempted = $false
     $lastActivity = [datetime]::UtcNow
     $lastBytes = $null
-    $inactivityWindow = [timespan]::FromMinutes(15)
+    $inactivityWindow = [timespan]::FromMinutes(5)
     try {
         if (Get-Command -Name Clean-BitsTempFiles -ErrorAction SilentlyContinue) {
             Clean-BitsTempFiles

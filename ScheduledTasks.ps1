@@ -176,7 +176,7 @@ function Register-PostRebootValidationTask {
         try {
             $runOnceKey = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce"
             New-Item -Path $runOnceKey -Force | Out-Null
-            $command = ('"{0}" /Run /TN "{1}"' -f $schtasksExe, $postRebootValidationTaskName)
+            $command = ('"{0}" -ExecutionPolicy Bypass -NoProfile -WindowStyle Hidden -Command "Start-ScheduledTask -TaskName ''{1}''"' -f $powershellExe, $postRebootValidationTaskName)
             Set-ItemProperty -Path $runOnceKey -Name $postRebootValidationRunOnce -Value $command -Force
             Write-Log -Message ("Registered RunOnce {0} to trigger SYSTEM validation task {1}." -f $postRebootValidationRunOnce, $postRebootValidationTaskName) -Level "VERBOSE"
         } catch {
