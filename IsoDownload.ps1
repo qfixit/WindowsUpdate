@@ -1,6 +1,6 @@
 # ISO Download Helpers
-# Version 2.7.2
-# Date 12/03/2025
+# Version 2.7.3
+# Date 12/04/2025
 # Author: Quintin Sheppard
 # Summary: Disk space checks, ISO health/hash validation, and BITS download wrapper for the Windows 11 upgrade.
 # Example test (download only): powershell.exe -ExecutionPolicy Bypass -NoProfile -Command ". '\Windows11Upgrade\ISO Download\IsoDownload.ps1'; Invoke-TimedIsoDownload -SourceUrl 'https://example.com/test.iso' -DestinationPath 'C:\Temp\WindowsUpdate\Test.iso'"
@@ -35,18 +35,6 @@ function Invoke-DirectIsoDownload {
     }
 }
 
-function Clean-BitsTempFiles {
-    try {
-        if (Test-Path -Path $stateDirectory) {
-            Get-ChildItem -Path $stateDirectory -Filter "BIT*.tmp" -File -ErrorAction Stop | ForEach-Object {
-                try { Remove-Item -Path $_.FullName -Force -ErrorAction Stop } catch {}
-            }
-        }
-    } catch {
-        Write-Log -Message ("Unable to clean BITS temp files. Error: {0}" -f $_) -Level "WARN"
-    }
-}
-
 function Invoke-TimedIsoDownload {
     param(
         [string]$SourceUrl,
@@ -58,6 +46,9 @@ function Invoke-TimedIsoDownload {
     $lastPercentLogged = -5
     $downloadCompleted = $false
     $bitsAttempted = $false
+    $lastActivity = [datetime]::UtcNow
+    $lastBytes = $null
+    $inactivityWindow = [timespan]::FromMinutes(15)
     try {
         if (Get-Command -Name Clean-BitsTempFiles -ErrorAction SilentlyContinue) {
             Clean-BitsTempFiles
@@ -131,9 +122,28 @@ function Invoke-TimedIsoDownload {
 
             if ($status.BytesTotal -gt 0 -and $status.JobState -eq 'Transferring') {
                 $percent = [math]::Round(($status.BytesTransferred / $status.BytesTotal) * 100, 1)
+                if ($null -ne $status.BytesTransferred -and ($lastBytes -eq $null -or $status.BytesTransferred -ne $lastBytes)) {
+                    $lastBytes = $status.BytesTransferred
+                    $lastActivity = [datetime]::UtcNow
+                }
                 if ($percent -ge ($lastPercentLogged + 5)) {
                     Write-Log -Message ("ISO download progress: {0}%" -f $percent) -Level "INFO"
                     $lastPercentLogged = $percent
+                }
+            }
+
+            if ($status.JobState -eq 'TransientError' -or $status.JobState -eq 'Suspended' -or $status.JobState -eq 'Transferring') {
+                if ([datetime]::UtcNow -gt $lastActivity.Add($inactivityWindow)) {
+                    Write-Log -Message ("BITS download stalled for more than {0} minutes; cancelling job and falling back to Invoke-WebRequest." -f [math]::Round($inactivityWindow.TotalMinutes, 0)) -Level "WARN"
+                    try {
+                        Remove-BitsTransfer -BitsJob $status -ErrorAction SilentlyContinue
+                    } catch {}
+                    try {
+                        Invoke-DirectIsoDownload -SourceUrl $SourceUrl -DestinationPath $DestinationPath
+                        return
+                    } catch {
+                        Write-ErrorCode -Code 11 -Detail $_
+                    }
                 }
             }
 
@@ -205,8 +215,32 @@ function Ensure-SufficientDiskSpace {
 
     $freeSpace = Get-SystemDriveFreeSpaceGb
     if ($null -eq $freeSpace) {
-        Write-Log -Message "Free space could not be determined; continuing with caution." -Level "WARN"
-        return $true
+        try {
+            $cimDisk = Get-CimInstance -ClassName Win32_LogicalDisk -Filter "DeviceID='C:'" -ErrorAction Stop
+            if ($cimDisk) {
+                $freeSpace = [math]::Round($cimDisk.FreeSpace / 1GB, 2)
+            }
+        } catch {
+            Write-Log -Message ("Secondary disk space probe via CIM failed. Error: {0}" -f $_) -Level "VERBOSE"
+        }
+    }
+
+    if ($null -eq $freeSpace) {
+        try {
+            $psDrive = Get-PSDrive -Name C -ErrorAction Stop
+            if ($psDrive -and $psDrive.Free -ne $null) {
+                $freeSpace = [math]::Round($psDrive.Free / 1GB, 2)
+            }
+        } catch {
+            Write-Log -Message ("PSDrive free space probe failed. Error: {0}" -f $_) -Level "VERBOSE"
+        }
+    }
+
+    if ($null -eq $freeSpace) {
+        $failureReason = "Unable to determine free space on the system drive; aborting Windows 11 upgrade to avoid disk exhaustion."
+        Write-Log -Message $failureReason -Level "ERROR"
+        Write-FailureMarker $failureReason
+        throw $failureReason
     }
 
     if ($freeSpace -ge $MinimumGb) {

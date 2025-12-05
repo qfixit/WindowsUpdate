@@ -92,7 +92,7 @@
     "Title": "System shutdown in progress",
     "Description": "Windows reported a shutdown during the upgrade.",
     "Remediation": "Allow the device to reboot, then rerun the upgrade; self-repair will restage.",
-    "Recoverable": true,
+    "Recoverable": false,
     "Command": ""
   },
   {
@@ -108,7 +108,7 @@
     "Title": "ISO validation failed",
     "Description": "ISO health/hash checks failed after retries.",
     "Remediation": "Confirm the ISO URL and expected SHA256; rerun after updating configuration.",
-    "Recoverable": true,
+    "Recoverable": false,
     "Command": ""
   },
   {

@@ -1,6 +1,6 @@
 # Upgrade Configuration
-# Version 2.7.0
-# Date 12/03/2025
+# Version 2.7.1
+# Date 12/04/2025
 # Author: Quintin Sheppard
 # Summary: Loads configuration from JSON (C:\Temp\WindowsUpdate\config.json) and exports it for the upgrade workflow.
 # Example: powershell.exe -ExecutionPolicy Bypass -NoProfile -Command ". '\\Windows11Upgrade\\UpgradeConfig.ps1'; $cfg = Set-UpgradeConfig; $cfg.BaseLogFile"
@@ -84,7 +84,10 @@ function Build-SetupArguments {
     )
 
     $dynamicPart = if ($DynamicUpdateEnabled) { "/DynamicUpdate Enable" } else { "/DynamicUpdate Disable" }
-    $args = "$BaseArguments $dynamicPart /NoReboot"
+    $args = "$BaseArguments $dynamicPart"
+    if ($args -notmatch "(?i)/noreboot") {
+        $args = "$args /NoReboot"
+    }
     return $args.Trim()
 }
 

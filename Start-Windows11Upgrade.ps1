@@ -1,6 +1,6 @@
 # Start-Windows11Upgrade Orchestration
-# Version 2.7.0
-# Date 12/03/2025
+# Version 2.7.1
+# Date 12/04/2025
 # Author: Quintin Sheppard
 # Summary: Implements the Expected Workflow to stage the Windows 11 upgrade, handle reboots, and self-heal failures.
 # Example: powershell.exe -ExecutionPolicy Bypass -NoProfile -Command ". '\\Windows11Upgrade\\Start-Windows11Upgrade.ps1'; Start-Windows11Upgrade"
@@ -36,6 +36,9 @@ try {
 
     $state = Get-UpgradeState
     $currentBootTime = Get-LastBootTime
+    $needsStaging = $true
+    $pendingHandledViaSelfRepair = $false
+    $pendingStateDetected = $false
 
     if ($currentBootTime) {
         Write-Log -Message ("Current boot time: {0:o}" -f $currentBootTime) -Level "VERBOSE"
@@ -90,10 +93,6 @@ try {
         Invoke-AutoReboot -ShouldReboot $autoRebootPending
         return
     }
-
-    $needsStaging = $true
-    $pendingHandledViaSelfRepair = $false
-    $pendingStateDetected = $false
 
     if ($state -and $state.Status -eq "PendingReboot") {
         $pendingStateDetected = $true
@@ -226,6 +225,10 @@ try {
                         Write-Log -Message ("Unable to read failure marker after staging failure. Error: {0}" -f $_) -Level "WARN"
                     }
                 }
+
+                $detailForExit = if ($failureReason) { $failureReason } else { "Upgrade staging failed." }
+                Write-ErrorCode -Code 1 -Detail $detailForExit
+                return
             }
         } catch {
             Write-Log -Message "Unhandled error during staging: $_" -Level "ERROR"
@@ -262,12 +265,6 @@ try {
         Invoke-UpgradeFailureCleanup -PreserveHealthyIso
     } catch {
         Write-Log -Message "Cleanup after failure encountered an additional error: $_" -Level "WARN"
-    }
-
-    try {
-        Register-PostRebootValidationTask
-    } catch {
-        Write-Log -Message "Failed to register post-reboot validation after interruption. Error: $_" -Level "WARN"
     }
 
     Complete-Execution -Message "Windows 11 25H2 upgrade script finished with errors."

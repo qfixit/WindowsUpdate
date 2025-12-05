@@ -1,6 +1,6 @@
 # Core Utilities & Progress Helpers
-# Version 2.7.0
-# Date 12/03/2025
+# Version 2.7.1
+# Date 12/04/2025
 # Author: Quintin Sheppard
 # Summary: Common logging, directory creation, and progress/summary helpers used across the upgrade workflow.
 # Example: powershell.exe -ExecutionPolicy Bypass -NoProfile -Command ". '\\Windows11Upgrade\\MainFunctions.ps1'; Write-Log 'hello world'"
@@ -48,15 +48,21 @@ function Write-Log {
         }
     }
 
-    switch ($Level) {
-        "ERROR"   { Write-Error $logMessage }
-        "WARN"    { Write-Warning $logMessage }
-        "VERBOSE" { Write-Verbose $logMessage }
-        default   { Write-Information -MessageData $logMessage -InformationAction Continue }
-    }
+    $previousEap = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    try {
+        switch ($Level) {
+            "ERROR"   { Write-Error -Message $logMessage -ErrorAction Continue }
+            "WARN"    { Write-Warning $logMessage }
+            "VERBOSE" { Write-Verbose $logMessage }
+            default   { Write-Information -MessageData $logMessage -InformationAction Continue }
+        }
 
-    if ($Level -ne "VERBOSE") {
-        Write-Verbose $logMessage
+        if ($Level -ne "VERBOSE") {
+            Write-Verbose $logMessage
+        }
+    } finally {
+        $ErrorActionPreference = $previousEap
     }
 }
 
@@ -290,7 +296,7 @@ function Write-SetupProgressUpdate {
         }
     }
 
-    if (-not $shouldLog -and $Force -and $Tracker.SourceDetected) {
+    if (-not $shouldLog -and $Force -and $Tracker.SourceDetected -and ($Tracker.LastProgress -ne 100)) {
         $finalProgress = if ($null -ne $Tracker.LastProgress) { "{0}%" -f $Tracker.LastProgress } else { "unknown" }
         Write-Log -Message ("Install progress final state: {0}" -f $finalProgress) -Level "INFO"
     }

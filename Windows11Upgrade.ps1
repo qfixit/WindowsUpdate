@@ -1,8 +1,8 @@
 # Windows 11 Upgrade Orchestrator (Modular)
 # Quintin Sheppard
-# Updated 12/03/2025
+# Updated 12/04/2025
 # Author: Quintin Sheppard
-# Script Version 2.7.0
+# Script Version 2.7.1
 # Summary: Downloads/validates the Windows 11 25H2 ISO, stages setup.exe /noreboot, writes state markers, self-heals failed runs, and registers reminder/validation tasks.
 # Example: powershell.exe -ExecutionPolicy Bypass -NoProfile -File ".\Windows11Upgrade.ps1" -VerboseLogging
 

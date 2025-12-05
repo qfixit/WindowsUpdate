@@ -1,6 +1,6 @@
 # Self-Repair Routine
-# Version 2.6.3
-# Date 11/30/2025
+# Version 2.6.4
+# Date 12/04/2025
 # Author: Quintin Sheppard
 # Summary: Restages the upgrade if a pending reboot failed to complete.
 # Example: powershell.exe -ExecutionPolicy Bypass -NoProfile -Command ". '\\Windows11Upgrade\\SelfRepair\\SelfRepair.ps1'; Invoke-SelfRepair"
@@ -63,11 +63,6 @@ function Invoke-SelfRepair {
             }
         } catch {
             Write-Log -Message "Reboot reminder toast failed during self-repair; continuing without user notification. Error: $_" -Level "WARN"
-        }
-        try {
-            Register-PostRebootValidationTask
-        } catch {
-            Write-Log -Message "Failed to register post-reboot validation task during self-repair. Error: $_" -Level "WARN"
         }
         if ($State) {
             $latestBoot = Get-LastBootTime

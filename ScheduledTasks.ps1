@@ -1,6 +1,6 @@
 # Scheduled Task Helpers
-# Version 2.5.9
-# Date 11/29/2025
+# Version 2.6.0
+# Date 12/04/2025
 # Author: Quintin Sheppard
 # Summary: Registers/cleans reboot reminder tasks and post-reboot validation tasks.
 # Example: powershell.exe -ExecutionPolicy Bypass -NoProfile -Command ". '\\Windows11Upgrade\\ScheduledTasks.ps1'; Register-RebootReminderTasks"
@@ -128,15 +128,30 @@ function Remove-RebootReminderTasks {
 }
 
 function Register-PostRebootValidationTask {
-    $targetScript = Join-Path -Path $privateRoot -ChildPath "PostUpgradeCleanup.ps1"
+    if ([string]::IsNullOrWhiteSpace($privateRoot)) {
+        try {
+            if ($PSScriptRoot) {
+                $privateRoot = $PSScriptRoot
+            } elseif ($MyInvocation -and $MyInvocation.MyCommand -and $MyInvocation.MyCommand.Path) {
+                $privateRoot = Split-Path -Path $MyInvocation.MyCommand.Path -Parent
+            } else {
+                $privateRoot = (Get-Location).ProviderPath
+            }
+        } catch {
+            $privateRoot = (Get-Location).ProviderPath
+        }
+    }
 
+    $targetScript = Join-Path -Path $privateRoot -ChildPath "Windows11Upgrade.ps1"
     $powershellExe = Join-Path -Path $env:SystemRoot -ChildPath "System32\WindowsPowerShell\v1.0\powershell.exe"
     $schtasksExe = Join-Path -Path $env:SystemRoot -ChildPath "System32\schtasks.exe"
+
     try {
         & $schtasksExe /Delete /TN $postRebootValidationTaskName /F 2>$null | Out-Null
     } catch {
-        # Missing task is fine; continue to registration.
+        # If the task does not exist, continue.
     }
+
     if (-not (Test-Path -Path $powershellExe -PathType Leaf)) {
         Write-Log -Message ("PowerShell executable not found at expected path {0}; post-reboot validation task will not be registered." -f $powershellExe) -Level "WARN"
         return
@@ -147,79 +162,38 @@ function Register-PostRebootValidationTask {
         return
     }
 
-    $command = "`"$powershellExe`" -ExecutionPolicy Bypass -NoProfile -File `"$targetScript`""
-    $schtasksExe = Join-Path -Path $env:SystemRoot -ChildPath "System32\schtasks.exe"
-    $schtasksArgs = @(
-        "/Create",
-        "/TN", $postRebootValidationTaskName,
-        "/TR", $command,
-        "/SC", "ONLOGON",
-        "/RL", "HIGHEST",
-        "/F",
-        "/RU", "SYSTEM"
-    )
-
-    try {
-        $schtasksOutput = & $schtasksExe @schtasksArgs 2>&1
-    } catch {
-        Write-Log -Message ("Register-PostRebootValidationTask execution failed. Command: {0} {1}. Error: {2}" -f $schtasksExe, ($schtasksArgs -join " "), $_) -Level "WARN"
-        return
-    }
-
+    $taskCommand = ('"{0}" -ExecutionPolicy Bypass -NoProfile -WindowStyle Hidden -File "{1}"' -f $powershellExe, $targetScript)
+    $createArgs = @("/Create", "/TN", $postRebootValidationTaskName, "/TR", $taskCommand, "/SC", "ONSTART", "/RU", "SYSTEM", "/RL", "HIGHEST", "/F")
+    $createOutput = & $schtasksExe $createArgs 2>&1
     if ($LASTEXITCODE -ne 0) {
-        Write-Log -Message ("Failed to register post-reboot validation task. Exit code: {0}. Command: {1}" -f $LASTEXITCODE, $command) -Level "WARN"
-        if ($schtasksOutput) {
-            $formatted = ($schtasksOutput | Where-Object { $_ } | Out-String).Trim()
-            if ($formatted) {
-                Write-Log -Message ("schtasks output: {0}" -f $formatted) -Level "WARN"
-            }
-        }
+        Write-Log -Message ("Failed to register SYSTEM post-reboot validation task {0}. Exit code: {1}. Command: schtasks {2}" -f $postRebootValidationTaskName, $LASTEXITCODE, ($createArgs -join " ")) -Level "ERROR"
+        if ($createOutput) { Write-Log -Message ("schtasks output: {0}" -f (($createOutput | Out-String).Trim())) -Level "WARN" }
     } else {
-        Write-Log -Message "Post-reboot validation task registered to rerun the script after the next restart." -Level "INFO"
-    }
-
-    # RunOnce fallback in case Task Scheduler deletes/blocks the task before reboot.
-    if ($postRebootValidationRunOnce) {
-        try {
-            $runOnceKey = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce"
-            New-Item -Path $runOnceKey -Force | Out-Null
-            Set-ItemProperty -Path $runOnceKey -Name $postRebootValidationRunOnce -Value $command -Force
-            Write-Log -Message ("Registered RunOnce fallback {0} to execute post-reboot validation." -f $postRebootValidationRunOnce) -Level "VERBOSE"
-        } catch {
-            Write-Log -Message ("Failed to register RunOnce fallback for post-reboot validation. Error: {0}" -f $_) -Level "WARN"
-        }
-    }
-}
-
-function Register-PostRebootValidationTask {
-    $targetScript = Join-Path -Path $privateRoot -ChildPath "Windows11Upgrade.ps1"
-
-    $powershellExe = Join-Path -Path $env:SystemRoot -ChildPath "System32\WindowsPowerShell\v1.0\powershell.exe"
-
-    if (-not (Test-Path -Path $powershellExe -PathType Leaf)) {
-        Write-Log -Message ("PowerShell executable not found at expected path {0}; post-reboot validation runonce will not be registered." -f $powershellExe) -Level "WARN"
-        return
-    }
-
-    if (-not (Test-Path -Path $targetScript -PathType Leaf)) {
-        Write-Log -Message ("Post-reboot validation script missing at {0}; runonce will not be registered." -f $targetScript) -Level "WARN"
-        return
+        Write-Log -Message ("Registered SYSTEM post-reboot validation task {0} (ONSTART trigger)." -f $postRebootValidationTaskName) -Level "INFO"
     }
 
     if ($postRebootValidationRunOnce) {
         try {
             $runOnceKey = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce"
             New-Item -Path $runOnceKey -Force | Out-Null
-            $command = ('"{0}" -ExecutionPolicy Bypass -NoProfile -WindowStyle Hidden -File "{1}"' -f $powershellExe, $targetScript)
+            $command = ('"{0}" /Run /TN "{1}"' -f $schtasksExe, $postRebootValidationTaskName)
             Set-ItemProperty -Path $runOnceKey -Name $postRebootValidationRunOnce -Value $command -Force
-            Write-Log -Message ("Registered RunOnce {0} to execute post-reboot validation." -f $postRebootValidationRunOnce) -Level "VERBOSE"
+            Write-Log -Message ("Registered RunOnce {0} to trigger SYSTEM validation task {1}." -f $postRebootValidationRunOnce, $postRebootValidationTaskName) -Level "VERBOSE"
         } catch {
-            Write-Log -Message ("Failed to register RunOnce for post-reboot validation. Error: {0}" -f $_) -Level "WARN"
+            Write-Log -Message ("Failed to register RunOnce trigger for post-reboot validation. Error: {0}" -f $_) -Level "WARN"
         }
     }
 }
 
 function Remove-PostRebootValidationTask {
+    $schtasksExe = Join-Path -Path $env:SystemRoot -ChildPath "System32\schtasks.exe"
+    try {
+        & $schtasksExe /Delete /TN $postRebootValidationTaskName /F 2>$null | Out-Null
+        Write-Log -Message ("Removed post-reboot validation scheduled task {0} (if present)." -f $postRebootValidationTaskName) -Level "VERBOSE"
+    } catch {
+        Write-Log -Message ("Failed to delete post-reboot validation task {0}. Error: {1}" -f $postRebootValidationTaskName, $_) -Level "WARN"
+    }
+
     if ($postRebootValidationRunOnce) {
         try {
             $runOnceKey = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce"

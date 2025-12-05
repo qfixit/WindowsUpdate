@@ -22,6 +22,9 @@ function Invoke-TimedSetupExecution {
         MissingLogged  = $false
     }
     $lastProgressChange = [datetime]::UtcNow
+    $progressSeen = $false
+    $stallGuardArmed = $false
+    $lastCpuTime = $null
     try {
         $process = Start-Process -FilePath $ExecutablePath -ArgumentList $Arguments -PassThru -WindowStyle Hidden
         if (-not $process) {
@@ -33,10 +36,23 @@ function Invoke-TimedSetupExecution {
                 Write-SetupProgressUpdate -Tracker $progressTracker
                 if ($progressTracker.LastProgress -ne $null) {
                     $lastProgressChange = [datetime]::UtcNow
+                    $progressSeen = $true
+                    $stallGuardArmed = $true
                 }
             }
 
-            if ($ProgressTimeoutMinutes -gt 0) {
+            try {
+                $procSample = Get-Process -Id $process.Id -ErrorAction Stop
+                if ($procSample -and $procSample.TotalProcessorTime -ne $lastCpuTime) {
+                    $lastCpuTime = $procSample.TotalProcessorTime
+                    $lastProgressChange = [datetime]::UtcNow
+                    $stallGuardArmed = $true
+                }
+            } catch {
+                # If sampling fails, keep existing timers.
+            }
+
+            if ($ProgressTimeoutMinutes -gt 0 -and $stallGuardArmed) {
                 $stallWindow = $lastProgressChange.AddMinutes($ProgressTimeoutMinutes)
                 if ([datetime]::UtcNow -gt $stallWindow) {
                     try { Stop-Process -Id $process.Id -Force -ErrorAction SilentlyContinue } catch {}
@@ -179,15 +195,17 @@ function Stage-UpgradeFromIso {
                     try {
                         Write-Log -Message ("Attempting self-repair for {0}: {1}" -f $codeForLookup, $errorInfo.Command) -Level "WARN"
                         $cmdPath = Join-Path -Path $env:SystemRoot -ChildPath "System32\\cmd.exe"
-                        $proc = Start-Process -FilePath $cmdPath -ArgumentList "/c $($errorInfo.Command)" -Wait -PassThru -WindowStyle Hidden -ErrorAction Stop
-                        if ($proc.ExitCode -eq 0) {
+                        $output = & $cmdPath /c $errorInfo.Command 2>&1
+                        $procExit = $LASTEXITCODE
+                        Write-Log -Message ("Self-repair output for {0}: {1}" -f $codeForLookup, ($output -join "; ")) -Level "INFO"
+                        if ($procExit -eq 0) {
                             Write-Log -Message ("Self-repair command succeeded for {0}; retrying staging." -f $codeForLookup) -Level "INFO"
                             $failureReason = $null
                             $exitCode = $null
                             Start-Sleep -Seconds 5
                             continue
                         } else {
-                            Write-Log -Message ("Self-repair command for {0} exited with code {1}; continuing failure handling." -f $codeForLookup, $proc.ExitCode) -Level "WARN"
+                            Write-Log -Message ("Self-repair command for {0} exited with code {1}; continuing failure handling." -f $codeForLookup, $procExit) -Level "WARN"
                         }
                     } catch {
                         Write-Log -Message ("Self-repair command for {0} failed. Error: {1}" -f $codeForLookup, $_) -Level "WARN"
@@ -250,6 +268,12 @@ function Stage-UpgradeFromIso {
             $info = Get-ErrorCodeInfo -Code $codeForLookup
         }
         if ($info -and $info.Title -and $info.Title -ne "Unknown error") {
+            Write-Log -Message ("Error Title: {0}." -f $info.Title) -Level "INFO"
+            Write-Log -Message ("Error Description: {0}." -f $info.Description) -Level "INFO"
+            if ($info.Remediation) { Write-Log -Message ("Error Remediation: {0}" -f $info.Remediation) -Level "INFO" }
+            if ($info.PSObject.Properties.Match("Recoverable").Count -gt 0) {
+                Write-Log -Message ("Error Recoverable: {0}" -f $info.Recoverable) -Level "INFO"
+            }
             $failureReason = ("setup.exe exited with {0}. {1}. {2}" -f $codeForLookup, $info.Title, $info.Description)
             if ($info.Remediation) {
                 $failureReason = "$failureReason. Remediation: $($info.Remediation)"

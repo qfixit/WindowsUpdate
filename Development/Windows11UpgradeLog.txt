@@ -1,0 +1,176 @@
+[2025-12-04 22:12:39] [INFO] SetupDiag exited with code -2146233079
+[2025-12-04 22:12:39] [WARN] SetupDiag results file not found.
+2025-12-04 22:12:39 [INFO] Windows 11 25H2 upgrade script started. Windows11Upgrade version 2.7.1 - 12/04/2025
+2025-12-04 22:12:39 [INFO] SentinelOne agent not detected; continuing without SentinelOne gating.
+2025-12-04 22:12:39 [VERBOSE] Current boot time: 2025-12-01T21:14:26.5561940-06:00
+2025-12-04 22:12:39 [VERBOSE] Upgrade state saved to C:\Temp\WindowsUpdate\ScriptRunning.txt (ScriptRunning).
+2025-12-04 22:12:39 [VERBOSE] OS detection: Product=Windows 10 Pro; Build=19045; DisplayVersion=22H2; DetectedWindows11=False
+2025-12-04 22:12:39 [INFO] Pre-flight checks completed; beginning staging pipeline.
+2025-12-04 22:12:39 [INFO] Starting system requirement checks...
+2025-12-04 22:12:39 [INFO] TPM 2.0 found.
+2025-12-04 22:12:39 [INFO] Secure Boot is enabled.
+2025-12-04 22:12:40 [INFO] 64-bit processor found.
+2025-12-04 22:12:40 [INFO] Sufficient RAM found (>= 4GB).
+2025-12-04 22:12:40 [INFO] System meets the minimum requirements for Windows 11.
+2025-12-04 22:12:40 [INFO] System requirements confirmed; proceeding to ISO download and staging.
+2025-12-04 22:12:40 [INFO] Registered SYSTEM post-reboot validation task Win11_PostRebootValidation (ONSTART trigger).
+2025-12-04 22:12:40 [VERBOSE] Registered RunOnce Win11_PostRebootValidation_RunOnce to trigger SYSTEM validation task Win11_PostRebootValidation.
+2025-12-04 22:12:40 [VERBOSE] Removing orphaned BITS temp files before ISO validation and download.
+2025-12-04 22:12:40 [VERBOSE] Existing ISO detected at C:\Temp\WindowsUpdate\Windows11_25H2.iso. Validating...
+2025-12-04 22:12:57 [WARN] ISO hash validation failed. Expected d141f6030fed50f75e2b03e1eb2e53646c4b21e5386047cb860af5223f102a32; actual d74c3e3b1d0096b6134609e2730d73789cca014bed45758aee6fd4ff92d986f4.
+2025-12-04 22:12:57 [WARN] Existing ISO failed validation and will be replaced.
+2025-12-04 22:12:57 [INFO] Toast notification (Download) invoked
+2025-12-04 22:12:57 [INFO] Downloading Windows 11 25H2 ISO (attempt 1/3)...
+2025-12-04 22:13:03 [INFO] ISO download progress: 2.1%
+2025-12-04 22:13:18 [INFO] ISO download progress: 8.8%
+2025-12-04 22:13:33 [INFO] ISO download progress: 15.2%
+2025-12-04 22:13:48 [INFO] ISO download progress: 21.9%
+2025-12-04 22:14:03 [INFO] ISO download progress: 28.1%
+2025-12-04 22:14:18 [INFO] ISO download progress: 35.2%
+2025-12-04 22:14:33 [INFO] ISO download progress: 42.7%
+2025-12-04 22:14:43 [INFO] ISO download progress: 48%
+2025-12-04 22:14:53 [INFO] ISO download progress: 53.3%
+2025-12-04 22:15:08 [INFO] ISO download progress: 60.1%
+2025-12-04 22:15:23 [INFO] ISO download progress: 66.8%
+2025-12-04 22:15:39 [INFO] ISO download progress: 73.3%
+2025-12-04 22:15:54 [INFO] ISO download progress: 79.6%
+2025-12-04 22:16:09 [INFO] ISO download progress: 85%
+2025-12-04 22:16:24 [INFO] ISO download progress: 90.7%
+2025-12-04 22:16:39 [INFO] ISO download progress: 96.5%
+2025-12-04 22:16:49 [INFO] ISO download completed: 100%
+2025-12-04 22:16:49 [INFO] ISO download duration: 00:03:51.557 (231.56 seconds)
+2025-12-04 22:16:49 [INFO] Windows 11 ISO downloaded to C:\Temp\WindowsUpdate\Windows11_25H2.iso.
+2025-12-04 22:17:01 [VERBOSE] Cached ISO hash d141f6030fed50f75e2b03e1eb2e53646c4b21e5386047cb860af5223f102a32 to C:\Temp\WindowsUpdate\Windows11_25H2.iso.sha256.
+2025-12-04 22:17:01 [INFO] ISO hash validation succeeded (SHA256=d141f6030fed50f75e2b03e1eb2e53646c4b21e5386047cb860af5223f102a32).
+2025-12-04 22:17:02 [VERBOSE] Created directory C:\Temp\WindowsUpdate\SetupLogs
+2025-12-04 22:17:04 [INFO] Launching setup.exe from ISO with arguments: /Auto Upgrade /copylogs "C:\Temp\WindowsUpdate\SetupLogs" /NoReboot /EULA accept /Quiet /DynamicUpdate Enable
+2025-12-04 22:17:09 [INFO] Tracking Windows setup progress.
+2025-12-04 22:17:09 [INFO] Install progress 5%
+2025-12-04 22:17:24 [INFO] Install progress 6%
+2025-12-04 22:17:34 [INFO] Install progress 8%
+2025-12-04 22:17:40 [INFO] Install progress 12%
+2025-12-04 22:18:20 [INFO] Install progress 13%
+2025-12-04 22:28:21 [INFO] Install progress 14%
+2025-12-04 22:28:41 [INFO] Install progress 15%
+2025-12-04 22:29:01 [INFO] Install progress 17%
+2025-12-04 22:29:06 [INFO] Install progress 18%
+2025-12-04 22:29:11 [INFO] Install progress 20%
+2025-12-04 22:29:16 [INFO] Install progress 21%
+2025-12-04 22:29:21 [INFO] Install progress 23%
+2025-12-04 22:29:26 [INFO] Install progress 24%
+2025-12-04 22:30:02 [INFO] Install progress 25%
+2025-12-04 22:30:07 [INFO] Install progress 26%
+2025-12-04 22:30:17 [INFO] Install progress 27%
+2025-12-04 22:30:22 [INFO] Install progress 28%
+2025-12-04 22:30:37 [INFO] Install progress 29%
+2025-12-04 22:30:42 [INFO] Install progress 30%
+2025-12-04 22:30:47 [INFO] Install progress 31%
+2025-12-04 22:30:52 [INFO] Install progress 32%
+2025-12-04 22:31:07 [INFO] Install progress 33%
+2025-12-04 22:31:12 [INFO] Install progress 34%
+2025-12-04 22:31:17 [INFO] Install progress 35%
+2025-12-04 22:31:27 [INFO] Install progress 36%
+2025-12-04 22:32:07 [INFO] Install progress 37%
+2025-12-04 22:32:17 [INFO] Install progress 38%
+2025-12-04 22:32:32 [INFO] Install progress 39%
+2025-12-04 22:32:42 [INFO] Install progress 40%
+2025-12-04 22:32:52 [INFO] Install progress 44%
+2025-12-04 22:33:08 [INFO] Install progress 45%
+2025-12-04 22:33:28 [INFO] Install progress 46%
+2025-12-04 22:33:33 [INFO] Install progress 47%
+2025-12-04 22:33:38 [INFO] Install progress 49%
+2025-12-04 22:34:53 [INFO] Install progress 64%
+2025-12-04 22:39:54 [INFO] Install progress 66%
+2025-12-04 22:40:59 [INFO] Install progress 69%
+2025-12-04 22:41:19 [INFO] Install progress 74%
+2025-12-04 22:43:19 [INFO] Install progress 75%
+2025-12-04 22:43:35 [INFO] Install progress 76%
+2025-12-04 22:44:10 [INFO] Install progress 77%
+2025-12-04 22:44:30 [INFO] Install progress 91%
+2025-12-04 22:44:45 [INFO] Install progress 92%
+2025-12-04 22:46:30 [INFO] Install progress 93%
+2025-12-04 22:47:30 [INFO] Install progress 94%
+2025-12-04 22:49:20 [INFO] Install progress 96%
+2025-12-04 22:50:56 [INFO] Install progress 99%
+2025-12-04 22:51:01 [INFO] Install progress 100%
+2025-12-04 22:51:13 [INFO] Install progress 100%
+2025-12-04 22:51:13 [INFO] setup.exe execution duration: 00:34:08.797 (2048.8 seconds)
+2025-12-04 22:51:13 [INFO] setup.exe exited with code 0x00000000.
+2025-12-04 22:51:19 [INFO] Registered SYSTEM post-reboot validation task Win11_PostRebootValidation (ONSTART trigger).
+2025-12-04 22:51:19 [VERBOSE] Registered RunOnce Win11_PostRebootValidation_RunOnce to trigger SYSTEM validation task Win11_PostRebootValidation.
+2025-12-04 22:51:19 [INFO] Configuring reboot reminder notifications.
+2025-12-04 22:51:19 [VERBOSE] Reminder task command: "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -ExecutionPolicy Bypass -NoProfile -WindowStyle Hidden -File "C:\Temp\WindowsUpdate\Toast-Notification\Toast-Windows11RebootReminder.ps1"
+2025-12-04 22:51:19 [INFO] Win11_RebootReminder_1 registered for 11:00 daily.
+2025-12-04 22:51:19 [INFO] Win11_RebootReminder_2 registered for 16:00 daily.
+2025-12-04 22:51:19 [VERBOSE] Removed upgrade state file C:\Temp\WindowsUpdate\ScriptRunning.txt.
+2025-12-04 22:51:19 [VERBOSE] Upgrade state saved to C:\Temp\WindowsUpdate\PendingReboot.txt (PendingReboot).
+2025-12-04 22:51:19 [INFO] Reboot reminder toast invoked via C:\Temp\WindowsUpdate\Toast-Notification\Toast-Windows11RebootReminder.ps1.
+2025-12-04 22:51:19 [INFO] Execution timing summary:
+2025-12-04 22:51:19 [INFO]  - Total runtime: 00:38:41.374 (2,321.37 seconds)
+2025-12-04 22:51:19 [INFO]  - ISO download: 00:03:51.557 (231.56 seconds)
+2025-12-04 22:51:19 [INFO]  - setup.exe execution: 00:34:08.797 (2,048.80 seconds)
+2025-12-04 22:51:19 [INFO] Windows 11 upgrade script finished.
+2025-12-04 22:51:19 [INFO] AutoReboot enabled; initiating immediate restart to continue Windows 11 upgrade.
+[2025-12-04 22:56:18] [INFO] SetupDiag exited with code 0
+[2025-12-04 22:56:18] [INFO] SetupDiag results:
+
+Matching Profile found: FindSuccessfulUpgrade - 8A0824C8-A56D-4C55-95A0-22751AB62F3E
+SetupDiag version: 1.7.0.0
+System Information:
+	Machine Name = WIN-V-209
+	Manufacturer = VMware, Inc.
+	Model = VMware20,1
+	HostOSArchitecture = x64
+	FirmwareType = UEFI
+	BiosReleaseDate = 20250118000000.000000+000
+	BiosVendor = VMW201.00V.24504846.B64.2501180339
+	BiosVersion = VMW201.00V.24504846.B64.2501180339
+	HostOSVersion = 10.0.19045
+	HostOSBuildString = 19041.1.amd64fre.vb_release.191206-1406
+	TargetOSBuildString = 10.0.26100.5074 (ge_release_svc_prod3.250826-1428)
+	HostOSLanguageId = 1033
+	HostOSEdition = Professional
+	RegisteredAV = Windows Defender
+	FilterDrivers = WinSetupMon
+	UpgradeStartTime = 12/4/2025 10:17:05 PM
+	UpgradeEndTime = 12/4/2025 10:54:27 PM
+	UpgradeElapsedTime = 00:37:22
+
+
+SetupDiag reports successful upgrade found.
+This appears to be a successful update as the last operation was: OOBEBoot and the result was: success
+
+Last Setup Phase:
+Phase Name: End
+	Phase Started: 12/4/2025 10:54:24 PM
+	Phase Ended: 12/4/2025 10:54:24 PM
+	Phase Time Delta: 00:00:00
+	Completed Successfully? True
+
+
+Last Setup Operation:
+Operation Name: Start suspended services
+	Operation Started: 12/4/2025 10:54:18 PM
+	Operation Ended: 12/4/2025 10:54:21 PM
+	Operation Time Delta: 0:00:00:03.0000000
+	Completed Successfully? True
+
+
+2025-12-04 22:56:19 [INFO] Windows 11 25H2 upgrade script started. Windows11Upgrade version 2.7.1 - 12/04/2025
+2025-12-04 22:56:19 [INFO] SentinelOne agent not detected; continuing without SentinelOne gating.
+2025-12-04 22:56:19 [VERBOSE] Current boot time: 2025-12-04T22:51:43.5000000-06:00
+2025-12-04 22:56:19 [VERBOSE] OS detection: Product=Windows 10 Pro; Build=26200; DisplayVersion=25H2; DetectedWindows11=True
+2025-12-04 22:56:19 [INFO] Windows 11 already detected on this device.
+2025-12-04 22:56:19 [INFO] Starting post-upgrade cleanup workflow.
+2025-12-04 22:56:19 [VERBOSE] OS detection: Product=Windows 10 Pro; Build=26200; DisplayVersion=25H2; DetectedWindows11=True
+2025-12-04 22:56:19 [INFO] Removed state directory C:\Temp\WindowsUpdate on attempt 1.
+2025-12-04 22:56:19 [VERBOSE] Removed scheduled task Win11_RebootReminder_1 (if it existed).
+2025-12-04 22:56:19 [VERBOSE] Removed scheduled task Win11_RebootReminder_2 (if it existed).
+2025-12-04 22:56:19 [VERBOSE] Removed post-reboot validation scheduled task Win11_PostRebootValidation (if present).
+2025-12-04 22:56:19 [WARN] Failed to remove RunOnce fallback Win11_PostRebootValidation_RunOnce. Error: Property Win11_PostRebootValidation_RunOnce does not exist at path HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce.
+2025-12-04 22:56:20 [INFO] Post-upgrade cleanup complete; staging artifacts removed.
+2025-12-04 22:56:20 [INFO] Execution timing summary:
+2025-12-04 22:56:20 [INFO]  - Total runtime: 00:01:44.171 (104.17 seconds)
+2025-12-04 22:56:20 [INFO]  - ISO download: N/A
+2025-12-04 22:56:20 [INFO]  - setup.exe execution: N/A
+2025-12-04 22:56:20 [INFO] Windows 11 25H2 upgrade script finished.
