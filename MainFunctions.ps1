@@ -163,13 +163,21 @@ function Show-UpgradeProgressToast {
         [string]$DocLink
     )
 
-    if (-not (Should-ShowToastPhase -Phase $Phase)) { return }
     if (-not $ToastAssetsRoot) { return }
 
     $toastScript = Join-Path -Path $ToastAssetsRoot -ChildPath "Toast-Windows11Download.ps1"
     if (-not (Test-Path -Path $toastScript -PathType Leaf)) { return }
 
-    $appId = Get-ToastAppId
+    $phaseChanged = $false
+    if ($script:LastToastPhase) {
+        if ($script:LastToastPhase -ne $Phase) { $phaseChanged = $true }
+    }
+    $script:LastToastPhase = $Phase
+
+    $renderPercent = $PercentComplete
+    if ($phaseChanged -and $PercentComplete -ge 0) {
+        $renderPercent = 0
+    }
 
     $powershellExe = [System.IO.Path]::Combine($env:SystemRoot, "System32", "WindowsPowerShell", "v1.0", "powershell.exe")
     $argumentList = @(
@@ -177,7 +185,7 @@ function Show-UpgradeProgressToast {
         "-NoProfile",
         "-File", "`"$toastScript`"",
         "-Phase", $Phase,
-        "-PercentComplete", ([string]::Format([System.Globalization.CultureInfo]::InvariantCulture, "{0}", $PercentComplete))
+        "-PercentComplete", ([string]::Format([System.Globalization.CultureInfo]::InvariantCulture, "{0}", $renderPercent))
     )
 
     if ($Status) { $argumentList += @("-Status", "`"$Status`"") }

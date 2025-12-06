@@ -97,12 +97,18 @@ function Invoke-TimedIsoDownload {
                     Complete-BitsTransfer -BitsJob $status -ErrorAction Stop
                     Write-Log -Message "ISO download completed: 100%" -Level "INFO"
                     $downloadCompleted = $true
+                    if (Get-Command -Name Show-UpgradeProgressToast -ErrorAction SilentlyContinue) {
+                        Show-UpgradeProgressToast -Phase Download -PercentComplete 100 -Status "Download complete"
+                    }
                     break
                 }
                 'TransferredWithErrors' {
                     Complete-BitsTransfer -BitsJob $status -ErrorAction Stop
                     Write-Log -Message "ISO download completed with recovered errors." -Level "WARN"
                     $downloadCompleted = $true
+                    if (Get-Command -Name Show-UpgradeProgressToast -ErrorAction SilentlyContinue) {
+                        Show-UpgradeProgressToast -Phase Download -PercentComplete 100 -Status "Download complete"
+                    }
                     break
                 }
                 'Error' {
@@ -129,6 +135,9 @@ function Invoke-TimedIsoDownload {
                 if ($percent -ge ($lastPercentLogged + 5)) {
                     Write-Log -Message ("ISO download progress: {0}%" -f $percent) -Level "INFO"
                     $lastPercentLogged = $percent
+                    if (Get-Command -Name Show-UpgradeProgressToast -ErrorAction SilentlyContinue) {
+                        Show-UpgradeProgressToast -Phase Download -PercentComplete $percent -Status "Downloading..."
+                    }
                 }
             }
 
